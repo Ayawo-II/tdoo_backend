@@ -3,11 +3,22 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function init() {
-  console.log('🔧 Vérification/création des tables...');
+  console.log('🔧 Nettoyage et recréation des tables...');
   
   try {
+    // Désactiver les contraintes de clés étrangères
+    await prisma.$executeRawUnsafe(`SET FOREIGN_KEY_CHECKS = 0;`);
+    
+    // Supprimer les tables si elles existent
+    await prisma.$executeRawUnsafe(`DROP TABLE IF EXISTS tasks;`);
+    await prisma.$executeRawUnsafe(`DROP TABLE IF EXISTS users;`);
+    
+    // Réactiver les contraintes
+    await prisma.$executeRawUnsafe(`SET FOREIGN_KEY_CHECKS = 1;`);
+    
+    // Créer la table users
     await prisma.$executeRawUnsafe(`
-      CREATE TABLE IF NOT EXISTS utilisateurs (
+      CREATE TABLE users (
         id INT PRIMARY KEY AUTO_INCREMENT,
         username VARCHAR(191) NOT NULL UNIQUE,
         password VARCHAR(191) NOT NULL,
@@ -15,8 +26,9 @@ async function init() {
       )
     `);
     
+    // Créer la table tasks
     await prisma.$executeRawUnsafe(`
-      CREATE TABLE IF NOT EXISTS taches (
+      CREATE TABLE tasks (
         id INT PRIMARY KEY AUTO_INCREMENT,
         title VARCHAR(191) NOT NULL,
         description VARCHAR(191) NULL,
@@ -29,9 +41,9 @@ async function init() {
       )
     `);
     
-    console.log('✅ Tables OK');
+    console.log('✅ Tables users et tasks recréées avec succès !');
   } catch (error) {
-    console.log('⚠️ Erreur (peut être normale si tables déjà créées):', error.message);
+    console.log('❌ Erreur:', error.message);
   }
   await prisma.$disconnect();
 }
