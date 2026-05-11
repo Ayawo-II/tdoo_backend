@@ -9,7 +9,6 @@
   "scripts": {
     "build": "prisma generate",
     "start": "node server.js",
-    "postinstall": "prisma generate && node init-db.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
