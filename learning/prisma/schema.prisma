@@ -1,30 +1,23 @@
-generator client {
-  provider = "prisma-client-js"
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  tasks     Task[]
+
+  @@map("users")
 }
 
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-}
-
-model Task{
-  id          Int       @id @default(autoincrement())
+model Task {
+  id          Int      @id @default(autoincrement())
   title       String
   description String?
-  status      String    @default("pending")
+  status      String   @default("pending")
   dueDate     DateTime?
   userId      Int
-  user        User      @relation(fields:[userId], references:[id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-}
-
-model User{
-  id Int @id @default(autoincrement())
-  username String @unique
-  password String
-  createdAt DateTime @default(now())
-  tasks Task[]
-
+  @@map("tasks")
 }
